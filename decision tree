@@ -1,0 +1,42 @@
+import pandas as pd
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.model_selection import train_test_split
+from sklearn import metrics
+from sklearn.tree import plot_tree
+import matplotlib.pyplot as plt
+
+# Sample dataset (Age, Income, Student, Buys Computer)
+data = {
+    "Age": ["<=30", "<=30", "31-40", ">40", ">40", ">40", "31-40", "<=30", "<=30", ">40", "<=30", "31-40", "31-40", ">40"],
+    "Income": ["High", "High", "High", "Medium", "Low", "Low", "Low", "Medium", "Low", "Medium", "Medium", "Medium", "High", "Medium"],
+    "Student": ["No", "No", "No", "No", "Yes", "Yes", "Yes", "No", "Yes", "Yes", "Yes", "No", "Yes", "No"],
+    "BuysComputer": ["No", "No", "Yes", "Yes", "Yes", "No", "Yes", "No", "Yes", "Yes", "Yes", "Yes", "Yes", "No"]
+}
+
+# Convert categorical data to numerical values
+df = pd.DataFrame(data)
+df["Age"] = df["Age"].map({"<=30": 0, "31-40": 1, ">40": 2})
+df["Income"] = df["Income"].map({"Low": 0, "Medium": 1, "High": 2})
+df["Student"] = df["Student"].map({"No": 0, "Yes": 1})
+df["BuysComputer"] = df["BuysComputer"].map({"No": 0, "Yes": 1})
+
+# Split data into training and testing sets
+X = df[["Age", "Income", "Student"]]
+y = df["BuysComputer"]
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Create Decision Tree classifier
+clf = DecisionTreeClassifier(criterion="entropy")
+clf.fit(X_train, y_train)
+
+# Predict on test set
+y_pred = clf.predict(X_test)
+
+# Calculate accuracy
+accuracy = metrics.accuracy_score(y_test, y_pred)
+print(f"Decision Tree Accuracy: {accuracy:.2f}")
+
+# Visualize the Decision Tree
+plt.figure(figsize=(10, 6))
+plot_tree(clf, feature_names=["Age", "Income", "Student"], class_names=["No", "Yes"], filled=True)
+plt.show()
