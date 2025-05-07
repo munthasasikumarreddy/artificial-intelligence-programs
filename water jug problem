@@ -1,0 +1,52 @@
+from collections import deque
+
+def is_goal(state, goal):
+    return goal in state
+
+def get_successors(state, capacities):
+    a, b = state
+    max_a, max_b = capacities
+    successors = set()
+
+    # Fill either jug
+    successors.add((max_a, b))
+    successors.add((a, max_b))
+
+    # Empty either jug
+    successors.add((0, b))
+    successors.add((a, 0))
+
+    # Pour A -> B
+    transfer = min(a, max_b - b)
+    successors.add((a - transfer, b + transfer))
+
+    # Pour B -> A
+    transfer = min(b, max_a - a)
+    successors.add((a + transfer, b - transfer))
+
+    return successors
+
+def solve_water_jug(capacities, goal):
+    visited = set()
+    queue = deque([((0, 0), [])])  # (current state, path)
+
+    while queue:
+        (state, path) = queue.popleft()
+        if state in visited:
+            continue
+        visited.add(state)
+        path = path + [state]
+        if is_goal(state, goal):
+            return path
+        for next_state in get_successors(state, capacities):
+            queue.append((next_state, path))
+    return None
+
+# Example: Jug A = 4L, Jug B = 3L, Goal: 2L in Jug A
+solution = solve_water_jug((4, 3), 2)
+if solution:
+    print("Steps to reach the goal:")
+    for step in solution:
+        print(f"Jug A: {step[0]}L, Jug B: {step[1]}L")
+else:
+    print("No solution found.")
