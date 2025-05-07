@@ -1,0 +1,45 @@
+import itertools
+
+def travelling_salesman(graph, start):
+    # Get all cities except the start
+    cities = list(range(len(graph)))
+    cities.remove(start)
+
+    min_cost = float('inf')
+    best_path = []
+
+    # Try all permutations of the other cities
+    for perm in itertools.permutations(cities):
+        cost = 0
+        current = start
+
+        # Go through the path
+        for next_city in perm:
+            cost += graph[current][next_city]
+            current = next_city
+
+        # Return to the start
+        cost += graph[current][start]
+
+        # Update best solution
+        if cost < min_cost:
+            min_cost = cost
+            best_path = [start] + list(perm) + [start]
+
+    return min_cost, best_path
+
+# Example usage
+if __name__ == "__main__":
+    # Example distance matrix
+    graph = [
+        [0, 10, 15, 20],
+        [10, 0, 35, 25],
+        [15, 35, 0, 30],
+        [20, 25, 30, 0]
+    ]
+
+    start_city = 0
+    min_cost, best_path = travelling_salesman(graph, start_city)
+
+    print(f"Minimum cost: {min_cost}")
+    print(f"Best path: {best_path}")
