@@ -1,0 +1,70 @@
+import heapq
+
+# Manhattan Distance Heuristic
+def heuristic(state, goal):
+    distance = 0
+    for num in range(1, 9):
+        x1, y1 = [(ix, iy) for ix, row in enumerate(state) for iy, i in enumerate(row) if i == num][0]
+        x2, y2 = [(ix, iy) for ix, row in enumerate(goal) for iy, i in enumerate(row) if i == num][0]
+        distance += abs(x1 - x2) + abs(y1 - y2)
+    return distance
+
+# Find the position of 0 (empty space)
+def find_blank(state):
+    for i in range(3):
+        for j in range(3):
+            if state[i][j] == 0:
+                return i, j
+
+# Generate neighboring states by sliding
+def get_neighbors(state):
+    x, y = find_blank(state)
+    neighbors = []
+    moves = [(-1,0), (1,0), (0,-1), (0,1)]  # up, down, left, right
+    for dx, dy in moves:
+        nx, ny = x + dx, y + dy
+        if 0 <= nx < 3 and 0 <= ny < 3:
+            new_state = [list(row) for row in state]
+            new_state[x][y], new_state[nx][ny] = new_state[nx][ny], new_state[x][y]
+            neighbors.append(tuple(tuple(row) for row in new_state))
+    return neighbors
+
+# A* Search Algorithm
+def a_star(start, goal):
+    frontier = []
+    heapq.heappush(frontier, (0 + heuristic(start, goal), 0, start, []))
+    explored = set()
+    while frontier:
+        f, g, current, path = heapq.heappop(frontier)
+        if current == goal:
+            return path + [current]
+        explored.add(current)
+        for neighbor in get_neighbors(current):
+            if neighbor not in explored:
+                heapq.heappush(frontier, (g + 1 + heuristic(neighbor, goal), g + 1, neighbor, path + [current]))
+    return None
+
+# Pretty print the state
+def print_state(state):
+    for row in state:
+        print(' '.join(str(num) if num != 0 else ' ' for num in row))
+    print()
+
+# Example usage
+if __name__ == "__main__":
+    start = ((1, 2, 3),
+             (4, 0, 6),
+             (7, 5, 8))
+
+    goal = ((1, 2, 3),
+            (4, 5, 6),
+            (7, 8, 0))
+
+    solution = a_star(start, goal)
+
+    if solution:
+        print("Steps to solve:")
+        for step in solution:
+            print_state(step)
+    else:
+        print("No solution found.")
