@@ -1,0 +1,25 @@
+def vacuum_cleaner_reflex(room_state, initial_location):
+    location = initial_location
+    actions = []
+
+    for _ in range(2):  # only two locations A and B
+        if room_state[location] == 'dirty':
+            actions.append(f"Clean {location}")
+            room_state[location] = 'clean'
+        else:
+            actions.append(f"{location} already clean")
+        
+        # Move to the other location
+        location = 'B' if location == 'A' else 'A'
+        actions.append(f"Move to {location}")
+
+    return actions
+
+# Example usage
+room_state = {'A': 'dirty', 'B': 'dirty'}
+initial_location = 'A'
+
+actions = vacuum_cleaner_reflex(room_state, initial_location)
+print("Vacuum cleaner actions:")
+for action in actions:
+    print(action)
