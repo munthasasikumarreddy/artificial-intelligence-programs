@@ -1,0 +1,41 @@
+import itertools
+
+def solve_cryptarithmetic(words, result):
+    # Get all unique characters
+    unique_chars = set(''.join(words) + result)
+    if len(unique_chars) > 10:
+        print("Too many unique letters (more than 10). Cannot solve.")
+        return
+
+    unique_chars = list(unique_chars)
+    first_letters = set(word[0] for word in words + [result])
+
+    # Try all possible digit assignments
+    for perm in itertools.permutations(range(10), len(unique_chars)):
+        char_digit = dict(zip(unique_chars, perm))
+
+        # Skip if any first letter is assigned 0
+        if any(char_digit[ch] == 0 for ch in first_letters):
+            continue
+
+        # Calculate the numerical values
+        words_sum = sum(
+            int(''.join(str(char_digit[ch]) for ch in word))
+            for word in words
+        )
+        result_value = int(''.join(str(char_digit[ch]) for ch in result))
+
+        if words_sum == result_value:
+            print("Solution found:")
+            for ch in sorted(char_digit):
+                print(f"{ch} = {char_digit[ch]}")
+            print(f"{' + '.join(words)} = {result}")
+            print(f"{' + '.join(str(int(''.join(str(char_digit[ch]) for ch in word))) for word in words)} = {result_value}")
+            return
+
+    print("No solution found.")
+
+# Example usage:
+words = ['SEND', 'MORE']
+result = 'MONEY'
+solve_cryptarithmetic(words, result)
